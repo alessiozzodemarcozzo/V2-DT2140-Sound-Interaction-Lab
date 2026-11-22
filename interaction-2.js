@@ -107,7 +107,7 @@ function playAudio(y) {
     }
 
     dspNode.setParamValue("/marimba/midi/gain", 1);
-    setTimeout(() => { dspNode.setParamValue("/marimba/midi/gain", 0) }, 100);
+    setTimeout(() => { dspNode.setParamValue("/marimba/midi/gain", 0); }, 100);
 }
 
 //==========================================================================================
