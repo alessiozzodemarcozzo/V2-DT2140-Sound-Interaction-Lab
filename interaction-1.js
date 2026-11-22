@@ -12,7 +12,7 @@ let dspNodes = {};
 let dspNodeParams = {};
 
 // Change here depending on your wasm file names
-const dspNames = ["bells", "frenchBell", "russianBell"];
+const dspNames = ["englishBell", "frenchBell", "russianBell"];
 
 dspNames.forEach(dspName => {
     const instance = new FaustWasm2ScriptProcessor(dspName);
@@ -117,9 +117,7 @@ function playAudio(dspName, param) {
 
     dspNode.setParamValue(param, 10);
 
-    setTimeout(() => {
-        dspNode.setParamValue(param, 0);
-    }, 1000);
+    setTimeout(() => {dspNode.setParamValue(param, 0);}, 1000);
 }
 
 //==========================================================================================
