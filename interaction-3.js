@@ -105,6 +105,7 @@ function playAudio(pressure) {
     }
     console.log(pressure)
     dspNode.setParamValue("/thunder/rumble", pressure)
+    setTimeout(() => {dspNode.setParamValue("/thunder/rumble", 0);}, 3000);
 }
 
 //==========================================================================================
