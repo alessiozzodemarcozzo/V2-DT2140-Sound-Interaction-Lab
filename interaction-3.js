@@ -52,8 +52,8 @@ tuono.createDSP(audioContext, 1024)
 //==========================================================================================
 
 function accelerationChange(accx, accy, accz) {
-    if (accz>Math.abs(10))
-        playAudio(accz);
+    if (Math.abs(accz)>10)
+        playAudio(Math.abs(accz));
 }
 
 function rotationChange(rotx, roty, rotz) {
@@ -96,15 +96,16 @@ function getMinMaxParam(address) {
 //
 //==========================================================================================
 
-function playAudio(pressure) {
+function playAudio(acc) {
+    acc= acc/10;
     if (!dspNode) {
         return;
     }
     if (audioContext.state === 'suspended') {
         return;
     }
-    console.log(pressure);
-    dspNode.setParamValue("/thunder/rumble", pressure);
+    console.log(acc);
+    dspNode.setParamValue("/thunder/rumble", acc);
     setTimeout(() => {dspNode.setParamValue("/thunder/rumble", 0);}, 3000);
 }
 

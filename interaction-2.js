@@ -52,7 +52,7 @@ marimbaMIDI.createDSP(audioContext, 1024)
 //==========================================================================================
 
 function accelerationChange(accx, accy, accz) {
-    if (accx>10)
+    if (Math.abs(accx)>10)
         playAudio(Math.abs(accy)); //should be roty but i don't get how to do it todo: ask the guys
 }
 
