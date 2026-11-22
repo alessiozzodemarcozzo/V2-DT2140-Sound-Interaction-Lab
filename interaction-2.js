@@ -53,7 +53,7 @@ marimbaMIDI.createDSP(audioContext, 1024)
 
 function accelerationChange(accx, accy, accz) {
     if (accx>10)
-        playAudio(accy); //should be roty but i don't get how to do it todo: ask the guys
+        playAudio(Math.abs(accy)); //should be roty but i don't get how to do it todo: ask the guys
 }
 
 function rotationChange(rotx, roty, rotz) {
@@ -97,7 +97,6 @@ function getMinMaxParam(address) {
 //==========================================================================================
 
 function playAudio(y) {
-    y=Math.abs(y);
     while (y > 4) y--;// we need accy to be between 0 and 1, so we substract 1 until it is in that range
     console.log(y);
     if (!dspNode) {
