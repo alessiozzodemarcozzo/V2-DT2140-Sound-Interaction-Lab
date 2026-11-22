@@ -103,8 +103,8 @@ function playAudio(pressure) {
     if (audioContext.state === 'suspended') {
         return;
     }
-    console.log(pressure)
-    dspNode.setParamValue("/thunder/rumble", pressure)
+    console.log(pressure);
+    dspNode.setParamValue("/thunder/rumble", pressure);
     setTimeout(() => {dspNode.setParamValue("/thunder/rumble", 0);}, 3000);
 }
 

@@ -66,7 +66,7 @@ function rotationChange(rotx, roty, rotz) {
 }
 
 function mousePressed() {
-    playAudio("englishBell", "/englishBell/gate");
+    playAudio("russianBell", "/russianBell/gate");
     // Use this for debugging from the desktop!
 }
 
@@ -116,7 +116,7 @@ function playAudio(dspName, param) {
     }
 
     dspNode.setParamValue(param, 10);
-
+    
     setTimeout(() => {dspNode.setParamValue(param, 0);}, 1000);
 }
 
