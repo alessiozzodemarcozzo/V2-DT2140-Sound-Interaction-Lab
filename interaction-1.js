@@ -1,4 +1,3 @@
-
 //==========================================================================================
 // AUDIO SETUP
 //------------------------------------------------------------------------------------------
@@ -8,36 +7,37 @@
 //------------------------------------------------------------------------------------------
 //
 //==========================================================================================
-let dspNodes = {};
-let dspNodeParams = {};
+let dspNode = null;
+let dspNodeParams = null;
+let jsonParams = null;
 
-// Change here depending on your wasm file names
-const dspNames = ["englishBell", "frenchBell", "russianBell"];
+// Change here to ("tuono") depending on your wasm file name
+const dspName = "tuono";
+const instance = new FaustWasm2ScriptProcessor(dspName);
 
-dspNames.forEach(dspName => {
-    const instance = new FaustWasm2ScriptProcessor(dspName);
+// output to window or npm package module
+if (typeof module === "undefined") {
+    window[dspName] = instance;
+} else {
+    const exp = {};
+    exp[dspName] = instance;
+    module.exports = exp;
+}
 
-    // output to window or npm package module
-    if (typeof module === "undefined") {
-        window[dspName] = instance;
-    } else {
-        const exp = {};
-        exp[dspName] = instance;
-        module.exports = exp;
-    }
-
-    // The name should be the same as the WASM file
-    instance.createDSP(audioContext, 1024)
-        .then(node => {
-            dspNodes[dspName] = node;
-            node.connect(audioContext.destination);
-
-            console.log(dspName + ' params: ', node.getParams());
-
-            const jsonString = node.getJSON();
-            dspNodeParams[dspName] = JSON.parse(jsonString)["ui"][0]["items"];
-        });
-});
+// The name should be the same as the WASM file, so change tuono with brass if you use brass.wasm
+tuono.createDSP(audioContext, 1024)
+    .then(node => {
+        dspNode = node;
+        dspNode.connect(audioContext.destination);
+        console.log('params: ', dspNode.getParams());
+        const jsonString = dspNode.getJSON();
+        jsonParams = JSON.parse(jsonString)["ui"][0]["items"];
+        dspNodeParams = jsonParams
+        // const exampleMinMaxParam = findByAddress(dspNodeParams, "/thunder/rumble");
+        // // ALWAYS PAY ATTENTION TO MIN AND MAX, ELSE YOU MAY GET REALLY HIGH VOLUMES FROM YOUR SPEAKERS
+        // const [exampleMinValue, exampleMaxValue] = getParamMinMax(exampleMinMaxParam);
+        // console.log('Min value:', exampleMinValue, 'Max value:', exampleMaxValue);
+    });
 
 
 //==========================================================================================
@@ -51,22 +51,23 @@ dspNames.forEach(dspName => {
 //
 //==========================================================================================
 
+let lastThunder = 0;
 function accelerationChange(accx, accy, accz) {
-    if (accx > Math.abs(5))
-        playAudio("englishBell", "/englishBell/gate");
+    const totalAcc = Math.sqrt(accx * accx + accy * accy + accz * accz);
+    const now = millis();
 
-    if (accy > Math.abs(5))
-        playAudio("frenchBell", "/frenchBell/gate");
-
-    if (accz > Math.abs(5))
-        playAudio("russianBell", "/russianBell/gate");
+    // Free-fall detection (total acceleration drops near 0) with a 1-second cooldown
+    if (totalAcc > 11 && now - lastThunder > 1500) {
+        lastThunder = now;
+        playAudio();
+    }
 }
 
 function rotationChange(rotx, roty, rotz) {
 }
 
 function mousePressed() {
-    playAudio("russianBell", "/russianBell/gate");
+    playAudio(mouseX/windowWidth)
     // Use this for debugging from the desktop!
 }
 
@@ -78,21 +79,19 @@ function deviceMoved() {
 function deviceTurned() {
     threshVals[1] = turnAxis;
 }
-
 function deviceShaken() {
     shaketimer = millis();
     statusLabels[0].style("color", "pink");
-    
+    //playAudio();
 }
 
-function getMinMaxParam(dspName, address) {
-    const exampleMinMaxParam = findByAddress(dspNodeParams[dspName], address);
+function getMinMaxParam(address) {
+    const exampleMinMaxParam = findByAddress(dspNodeParams, address);
     // ALWAYS PAY ATTENTION TO MIN AND MAX, ELSE YOU MAY GET REALLY HIGH VOLUMES FROM YOUR SPEAKERS
     const [exampleMinValue, exampleMaxValue] = getParamMinMax(exampleMinMaxParam);
     console.log('Min value:', exampleMinValue, 'Max value:', exampleMaxValue);
-    return [exampleMinValue, exampleMaxValue];
+    return [exampleMinValue, exampleMaxValue]
 }
-
 
 //==========================================================================================
 // AUDIO INTERACTION
@@ -104,20 +103,15 @@ function getMinMaxParam(dspName, address) {
 //
 //==========================================================================================
 
-function playAudio(dspName, param) {
-    const dspNode = dspNodes[dspName];
-
+function playAudio() {
     if (!dspNode) {
         return;
     }
-
     if (audioContext.state === 'suspended') {
         return;
     }
-
-    dspNode.setParamValue(param, 10);
-    
-    setTimeout(() => {dspNode.setParamValue(param, 0);}, 1000);
+    dspNode.setParamValue("/thunder/rumble", 1);
+    setTimeout(() => { dspNode.setParamValue("/thunder/rumble", 0);}, 100);
 }
 
 //==========================================================================================
