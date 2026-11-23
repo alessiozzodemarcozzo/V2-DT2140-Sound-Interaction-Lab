@@ -106,9 +106,9 @@ function playAudio(y) {
         return;
     }
 
-    dspNode.setParamValue("/marimba/midi/gain", 1);
+    dspNode.setParamValue("/marimba/midi/gate", 1);
     dspNode.setParamValue("/marimba/otherParams/strikePosition", y);
-    setTimeout(() => { dspNode.setParamValue("/marimba/midi/gain", 0); }, 100);
+    setTimeout(() => { dspNode.setParamValue("/marimba/midi/gate", 0); }, 100);
     setTimeout(() => { dspNode.setParamValue("/marimba/otherParams/strikePosition", 0); }, 100);
     
 }
