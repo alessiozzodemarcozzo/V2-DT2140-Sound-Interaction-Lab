@@ -12,7 +12,7 @@ let dspNodeParams = null;
 let jsonParams = null;
 
 // Change here to ("tuono") depending on your wasm file name
-const dspName = "tuono";
+const dspName = "marimbaMIDI";
 const instance = new FaustWasm2ScriptProcessor(dspName);
 
 // output to window or npm package module
@@ -25,7 +25,7 @@ if (typeof module === "undefined") {
 }
 
 // The name should be the same as the WASM file, so change tuono with brass if you use brass.wasm
-tuono.createDSP(audioContext, 1024)
+marimbaMIDI.createDSP(audioContext, 1024)
     .then(node => {
         dspNode = node;
         dspNode.connect(audioContext.destination);
@@ -51,23 +51,16 @@ tuono.createDSP(audioContext, 1024)
 //
 //==========================================================================================
 
-let lastThunder = 0;
 function accelerationChange(accx, accy, accz) {
-    const totalAcc = Math.sqrt(accx * accx + accy * accy + accz * accz);
-    const now = millis();
-
-    // Free-fall detection (total acceleration drops near 0) with a 1-second cooldown
-    if (totalAcc > 11 && now - lastThunder > 1500) {
-        lastThunder = now;
-        playAudio();
-    }
+    if (Math.abs(accx)>10)
+        playAudio(Math.abs(accy)); //should be roty but i don't get how to do it todo: ask the guys
 }
 
 function rotationChange(rotx, roty, rotz) {
 }
 
 function mousePressed() {
-    playAudio(mouseX/windowWidth)
+    playAudio(10);
     // Use this for debugging from the desktop!
 }
 
@@ -103,15 +96,21 @@ function getMinMaxParam(address) {
 //
 //==========================================================================================
 
-function playAudio() {
+function playAudio(y) {
+    while (y > 4) y--;// we need accy to be between 0 and 1, so we substract 1 until it is in that range
+    console.log(y);
     if (!dspNode) {
         return;
     }
     if (audioContext.state === 'suspended') {
         return;
     }
-    dspNode.setParamValue("/thunder/rumble", 1);
-    setTimeout(() => { dspNode.setParamValue("/thunder/rumble", 0);}, 100);
+
+    dspNode.setParamValue("/marimba/midi/gain", 1);
+    dspNode.setParamValue("/marimba/otherParams/strikePosition", y);
+    setTimeout(() => { dspNode.setParamValue("/marimba/midi/gain", 0); }, 100);
+    setTimeout(() => { dspNode.setParamValue("/marimba/otherParams/strikePosition", 0); }, 100);
+    
 }
 
 //==========================================================================================
