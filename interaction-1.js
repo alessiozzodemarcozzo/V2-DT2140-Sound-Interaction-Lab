@@ -97,18 +97,19 @@ function getMinMaxParam(address) {
 //==========================================================================================
 
 function playAudio(y) {
-    while (y > 4) y--;// we need accy to be between 0 and 1, so we substract 1 until it is in that range
-    console.log(y);
+    while (y > 4) y=y-4;// we need accy to be between 0 and 1, so we substract 1 until it is in that range
+
     if (!dspNode) {
         return;
     }
     if (audioContext.state === 'suspended') {
         return;
     }
+        console.log(y);
 
-    dspNode.setParamValue("/marimba/midi/gate", 1);
+    dspNode.setParamValue("/marimba/gate", 1);
     dspNode.setParamValue("/marimba/otherParams/strikePosition", y);
-    setTimeout(() => { dspNode.setParamValue("/marimba/midi/gate", 0); }, 100);
+    setTimeout(() => { dspNode.setParamValue("/marimba/gate", 0); }, 100);
     setTimeout(() => { dspNode.setParamValue("/marimba/otherParams/strikePosition", 0); }, 100);
     
 }
